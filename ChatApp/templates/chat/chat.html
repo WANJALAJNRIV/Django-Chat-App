@@ -4,8 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat View</title>
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <script src="https://unpkg.com/hyperscript.org@0.9.14"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+        }
+        #chat_messages {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+        #chat_messages li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+        }
+        .author {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        form {
+            display: flex;
+            gap: 10px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    Chat View
+    <h2>Chat View</h2>
+
+    <ul id="chat_messages">
+        {% for message in chat_messages reversed %}
+            <li>
+                <span class="author">{{ message.author.username }}</span>
+                <span>{{ message.body }}</span>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <form method="POST" id="chat_message_form"
+          hx-post="{% url 'home_chat' %}"
+          hx-target="#chat_messages"
+          hx-swap="beforeend"
+          _="on htmx:afterRequest reset() me">
+        {% csrf_token %}
+        {{ form.body }}
+        <button type="submit">Send</button>
+    </form>
 </body>
 </html>
